@@ -1,13 +1,10 @@
 """A Pelican plugin which minifies HTML pages."""
-
-
 from logging import getLogger
 from os import walk
 from os.path import join
 
 from htmlmin import minify
 from pelican import signals
-from joblib import Parallel, delayed
 
 # We need save unicode strings to files.
 try:
@@ -23,13 +20,18 @@ def minify_html(pelican):
 
     :param pelican: The Pelican instance.
     """
-    options = pelican.settings.get('MINIFY', {})
+    options = pelican.settings.get("MINIFY", {})
     files_to_minify = []
 
-    for dirpath, _, filenames in walk(pelican.settings['OUTPUT_PATH']):
-        files_to_minify += [join(dirpath, name) for name in filenames if name.endswith('.html') or name.endswith('.htm')]
+    for dirpath, _, filenames in walk(pelican.settings["OUTPUT_PATH"]):
+        files_to_minify += [
+            join(dirpath, name)
+            for name in filenames
+            if name.endswith(".html") or name.endswith(".htm")
+        ]
 
-    Parallel(n_jobs=-1)(delayed(create_minified_file)(filepath, options) for filepath in files_to_minify)
+    for filepath in files_to_minify:
+        create_minified_file(filepath, options)
 
 
 def create_minified_file(filename, options):
@@ -37,15 +39,15 @@ def create_minified_file(filename, options):
 
     :param str filename: The file to minify.
     """
-    uncompressed = open(filename, encoding='utf-8').read()
+    uncompressed = open(filename, encoding="utf-8").read()
 
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filename, "w", encoding="utf-8") as f:
         try:
-            logger.debug('Minifying: %s' % filename)
+            logger.debug("Minifying: %s" % filename)
             compressed = minify(uncompressed, **options)
             f.write(compressed)
         except Exception as ex:
-            logger.critical('HTML Minification failed: %s' % ex)
+            logger.critical("HTML Minification failed: %s" % ex)
         finally:
             f.close()
 
