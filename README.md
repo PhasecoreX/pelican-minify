@@ -66,9 +66,9 @@ This reduces file size and obscures the public source code, but keep in
 mind--minifying your static site will increase your Pelican build times, as it
 adds extra file processing for each page generated.
 
-**NOTE**: You should probably include the `minify` plugin at the very bottom of
-your `PLUGINS` array.  This will ensure it is the last thing to run, and
-doesn't prematurely gzip any files.
+**NOTE**: You should probably include the `minify` plugin at the very end of
+your `PLUGINS` array, but still before `gzip_cache` if you are using it.
+This will ensure it is the last thing to run, just before the results are gzipped.
 
 
 ## Changelog
